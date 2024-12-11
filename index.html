@@ -4,13 +4,27 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Lit + TS</title>
+    <title>Simple Image Adjust</title>
     <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/my-element.ts"></script>
+    <script type="module" src="/src/simple-image-adjust.ts"></script>
   </head>
   <body>
-    <my-element>
-      <h1>Vite + Lit</h1>
-    </my-element>
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 100%;
+        height: 100dvh;
+      }
+
+      simple-image-adjust {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <simple-image-adjust src="http://localhost/media/images/PlainDoge.jpg"></simple-image-adjust>
   </body>
 </html>
