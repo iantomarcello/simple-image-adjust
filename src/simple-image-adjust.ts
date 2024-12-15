@@ -97,8 +97,6 @@ export class SimpleImageAdjust extends LitElement {
     this.addEventListener('pointermove', this.onCursorMove);
     this.addEventListener('pointerup', this.onCursorUp);
     this.addEventListener('wheel', this.onWheel);
-
-    // TODO: touch and pinch
   }
 
   removeEventListeners() {
@@ -106,7 +104,6 @@ export class SimpleImageAdjust extends LitElement {
     this.removeEventListener('pointermove', this.onCursorMove);
     this.removeEventListener('pointerup', this.onCursorUp);
     this.removeEventListener('wheel', this.onWheel);
-    // TODO: touch and pinch
   }
 
   async fetch(src: string = this.src) {
@@ -164,11 +161,9 @@ export class SimpleImageAdjust extends LitElement {
 
         if (this.prevDiff > 0) {
           if (curDiff > this.prevDiff) {
-            console.log("Pinch moving OUT -> Zoom in", event);
             this.scale(0.003);
           }
           if (curDiff < this.prevDiff) {
-            console.log("Pinch moving IN -> Zoom out", event);
             this.scale(-0.003);
           }
         }
