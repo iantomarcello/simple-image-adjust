@@ -15,6 +15,7 @@ export class SimpleImageAdjust extends LitElement {
   @property({ type: Number }) posX: number = 0;
   @property({ type: Number }) posY: number = 0;
   @property({ type: Number }) zoom: number = 1;
+  @property({ type: Boolean, attribute: "edit-mode" }) editMode: boolean = false;
   @query('#canvas') canvas!: HTMLCanvasElement;
   ctx!: CanvasRenderingContext2D | null;
   img = new Image();
@@ -58,13 +59,17 @@ export class SimpleImageAdjust extends LitElement {
         background-color: #56565669;
       }
     }
+
+    [hidden] {
+      display: none !important;
+    }
   `
 
   render() {
     return html`
       <div id="wrapper">
         <canvas id="canvas"></canvas>
-        <div id="controls">
+        <div id="controls" .hidden=${!this.editMode}>
           <button type="button" title="zoom in" @click=${() => this.scale(0.05)}>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Zm-40-60v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>
           </button>
@@ -80,19 +85,29 @@ export class SimpleImageAdjust extends LitElement {
     this.canvas.width = this.canvas.clientWidth;
     this.canvas.height = this.canvas.clientHeight;
     this.ctx = this.canvas.getContext('2d');
-    this.initEventListeners();
+
+    if (this.editMode) {
+      this.addEventListeners();
+    }
   }
 
   protected updated(_changedProperties: PropertyValues): void {
     if (_changedProperties.has('src')) {
       this.fetch(this.src);
     }
+    if (_changedProperties.has('editMode')) {
+      if (this.editMode) {
+        this.addEventListeners();
+      } else {
+        this.removeEventListeners();
+      }
+    }
     if (['posX', 'posY', 'zoom'].some(prop => _changedProperties.has(prop))) {
       this.draw();
     }
   }
 
-  initEventListeners() {
+  addEventListeners() {
     this.addEventListener('pointerdown', this.cursorDown);
     this.addEventListener('pointermove', this.onCursorMove);
     this.addEventListener('pointerup', this.onCursorUp);
@@ -117,7 +132,6 @@ export class SimpleImageAdjust extends LitElement {
   draw() {
     if (this.ctx) {
       const { width, height } = this.img;
-      const ratio = width / height;
 
       this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
       this.ctx.drawImage(
