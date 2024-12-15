@@ -1,7 +1,5 @@
 import { LitElement, PropertyValues, css, html } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js'
-import litLogo from './assets/lit.svg'
-import viteLogo from '/vite.svg'
 
 /**
  * An example element.
