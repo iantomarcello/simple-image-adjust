@@ -12,9 +12,9 @@ import viteLogo from '/vite.svg'
 @customElement('simple-image-adjust')
 export class SimpleImageAdjust extends LitElement {
   @property() src!: string;
-  @property({type: Number}) posX: number = 0;
-  @property({type: Number}) posY: number = 0;
-  @property({type: Number}) zoom: number = 1;
+  @property({ type: Number }) posX: number = 0;
+  @property({ type: Number }) posY: number = 0;
+  @property({ type: Number }) zoom: number = 1;
   @query('#canvas') canvas!: HTMLCanvasElement;
   ctx!: CanvasRenderingContext2D | null;
   img = new Image();
@@ -87,7 +87,7 @@ export class SimpleImageAdjust extends LitElement {
     this.img = new Image();
     this.img.addEventListener('load', () => {
       this.draw();
-    }, {once: true});
+    }, { once: true });
     this.img.src = src;
   }
 
@@ -154,8 +154,8 @@ export class SimpleImageAdjust extends LitElement {
 
   onCursorUp(event: PointerEvent) {
     // NOTE: Translate
-    this.cursorDownX = 0,
-    this.cursorDownY = 0,
+    this.cursorDownX = 0;
+    this.cursorDownY = 0;
     this.isCursorDown = false;
 
     // NOTE: Scale
