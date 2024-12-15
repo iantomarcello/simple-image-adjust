@@ -20,6 +20,8 @@ export class SimpleImageAdjust extends LitElement {
   isCursorDown = false;
   cursorDownX = 0;
   cursorDownY = 0;
+  eventCache: PointerEvent[] = [];
+  cursorPrevDiff = 0;
 
   static styles = css`
     :host {
@@ -79,7 +81,7 @@ export class SimpleImageAdjust extends LitElement {
     `
   }
 
-  protected firstUpdated(_changedProperties: PropertyValues): void {
+  protected firstUpdated(): void {
     this.canvas.width = this.canvas.clientWidth;
     this.canvas.height = this.canvas.clientHeight;
     this.ctx = this.canvas.getContext('2d');
@@ -142,9 +144,6 @@ export class SimpleImageAdjust extends LitElement {
     }
   }
 
-  evCache: any[] = []
-  prevDiff = 0;
-
   cursorDown(event: PointerEvent) {
     // NOTE: Translate
     this.cursorDownX = event.x - this.posX;
@@ -152,7 +151,7 @@ export class SimpleImageAdjust extends LitElement {
     this.isCursorDown = true;
 
     // NOTE: Scale
-    this.evCache.push(event);
+    this.eventCache.push(event);
   }
 
   onCursorMove(event: PointerEvent) {
@@ -163,24 +162,24 @@ export class SimpleImageAdjust extends LitElement {
 
       // NOTE: Scale
       // @see https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures
-      const index = this.evCache.findIndex(
+      const index = this.eventCache.findIndex(
         (cachedEv) => cachedEv.pointerId === event.pointerId,
       );
-      this.evCache[index] = event;
+      this.eventCache[index] = event;
 
-      if (this.evCache.length === 2) {
-        const curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
+      if (this.eventCache.length === 2) {
+        const curDiff = Math.abs(this.eventCache[0].clientX - this.eventCache[1].clientX);
 
-        if (this.prevDiff > 0) {
-          if (curDiff > this.prevDiff) {
+        if (this.cursorPrevDiff > 0) {
+          if (curDiff > this.cursorPrevDiff) {
             this.scale(0.003);
           }
-          if (curDiff < this.prevDiff) {
+          if (curDiff < this.cursorPrevDiff) {
             this.scale(-0.003);
           }
         }
 
-        this.prevDiff = curDiff;
+        this.cursorPrevDiff = curDiff;
       }
     }
   }
@@ -192,13 +191,13 @@ export class SimpleImageAdjust extends LitElement {
     this.isCursorDown = false;
 
     // NOTE: Scale
-    const index = this.evCache.findIndex(
+    const index = this.eventCache.findIndex(
       (cachedEv) => cachedEv.pointerId === event.pointerId,
     );
-    this.evCache.splice(index, 1);
+    this.eventCache.splice(index, 1);
 
-    if (this.evCache.length < 2) {
-      this.prevDiff = -1;
+    if (this.eventCache.length < 2) {
+      this.cursorPrevDiff = -1;
     }
   }
 
