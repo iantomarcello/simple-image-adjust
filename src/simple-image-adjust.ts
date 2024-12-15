@@ -35,7 +35,28 @@ export class SimpleImageAdjust extends LitElement {
     }
 
     #controls {
+      position: fixed;
+      left: 50%;
+      bottom: 1rem;
+      translate: -50% 0;
+      display: flex;
+      gap: 1rem;
+    }
 
+    button {
+      margin: 0;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #56565656;
+      border: 1px solid #56565656;
+      border-radius: 50%;
+      cursor: pointer;
+
+      &:hover, &:focus {
+        background-color: #56565669;
+      }
     }
   `
 
@@ -44,7 +65,12 @@ export class SimpleImageAdjust extends LitElement {
       <div id="wrapper">
         <canvas id="canvas"></canvas>
         <div id="controls">
-          <!-- Zoom in out -->
+          <button type="button" title="zoom in" @click=${() => this.scale(0.05)}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Zm-40-60v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>
+          </button>
+          <button type="button" title="zoom out" @click=${() => this.scale(-0.05)}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400ZM280-540v-80h200v80H280Z"/></svg>
+          </button>
         </div>
       </div>
     `
