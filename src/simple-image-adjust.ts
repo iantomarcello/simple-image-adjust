@@ -30,6 +30,8 @@ export class SimpleImageAdjust extends LitElement {
     #wrapper, #canvas {
       width: 100%;
       height: 100%;
+      overflow: hidden;
+      touch-action: none;
     }
 
     #controls {
@@ -66,17 +68,18 @@ export class SimpleImageAdjust extends LitElement {
 
   initEventListeners() {
     this.addEventListener('pointerdown', this.cursorDown);
-    this.addEventListener('pointermove', this.cursorMove);
-    this.addEventListener('pointerup', this.cursorUp);
-    this.addEventListener('wheel', this.scale);
+    this.addEventListener('pointermove', this.onCursorMove);
+    this.addEventListener('pointerup', this.onCursorUp);
+    this.addEventListener('wheel', this.onWheel);
+
     // TODO: touch and pinch
   }
 
   removeEventListeners() {
     this.removeEventListener('pointerdown', this.cursorDown);
-    this.removeEventListener('pointermove', this.cursorMove);
-    this.removeEventListener('pointerup', this.cursorUp);
-    this.removeEventListener('wheel', this.scale);
+    this.removeEventListener('pointermove', this.onCursorMove);
+    this.removeEventListener('pointerup', this.onCursorUp);
+    this.removeEventListener('wheel', this.onWheel);
     // TODO: touch and pinch
   }
 
@@ -92,7 +95,7 @@ export class SimpleImageAdjust extends LitElement {
     if (this.ctx) {
       const { width, height } = this.img;
       const ratio = width / height;
-      
+
       this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
       this.ctx.drawImage(
         this.img,
@@ -104,32 +107,79 @@ export class SimpleImageAdjust extends LitElement {
     }
   }
 
+  evCache: any[] = []
+  prevDiff = 0;
+
   cursorDown(event: PointerEvent) {
-    this.cursorDownX = event.x - this.posX,
-    this.cursorDownY = event.y - this.posY,
+    // NOTE: Translate
+    this.cursorDownX = event.x - this.posX;
+    this.cursorDownY = event.y - this.posY;
     this.isCursorDown = true;
+
+    // NOTE: Scale
+    this.evCache.push(event);
   }
 
-  cursorMove(event: PointerEvent) {
+  onCursorMove(event: PointerEvent) {
     if (this.isCursorDown) {
+      // NOTE: Translate
       this.posX = event.x - this.cursorDownX;
       this.posY = event.y - this.cursorDownY;
+
+      // NOTE: Scale
+      // @see https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures
+      const index = this.evCache.findIndex(
+        (cachedEv) => cachedEv.pointerId === event.pointerId,
+      );
+      this.evCache[index] = event;
+
+      if (this.evCache.length === 2) {
+        const curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
+
+        if (this.prevDiff > 0) {
+          if (curDiff > this.prevDiff) {
+            console.log("Pinch moving OUT -> Zoom in", event);
+            this.scale(0.003);
+          }
+          if (curDiff < this.prevDiff) {
+            console.log("Pinch moving IN -> Zoom out", event);
+            this.scale(-0.003);
+          }
+        }
+
+        this.prevDiff = curDiff;
+      }
     }
   }
 
-  cursorUp(event: PointerEvent) {
+  onCursorUp(event: PointerEvent) {
+    // NOTE: Translate
     this.cursorDownX = 0,
     this.cursorDownY = 0,
     this.isCursorDown = false;
+
+    // NOTE: Scale
+    const index = this.evCache.findIndex(
+      (cachedEv) => cachedEv.pointerId === event.pointerId,
+    );
+    this.evCache.splice(index, 1);
+
+    if (this.evCache.length < 2) {
+      this.prevDiff = -1;
+    }
   }
 
-  scale(event: WheelEvent) {
+  onWheel(event: WheelEvent) {
     const isZoomIn = event.deltaY < 0;
     if (isZoomIn) {
-      this.zoom += 0.2;
+      this.scale(0.05);
     } else {
-      this.zoom -= 0.2;
+      this.scale(-0.05);
     }
+  }
+
+  scale(amount = 0) {
+    this.zoom += amount;
   }
 
 }
