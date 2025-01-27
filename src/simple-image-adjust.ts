@@ -113,15 +113,15 @@ export class SimpleImageAdjust extends LitElement {
 
   addEventListeners() {
     this.addEventListener('pointerdown', this.cursorDown);
-    this.addEventListener('pointermove', this.onCursorMove);
-    this.addEventListener('pointerup', this.onCursorUp);
+    window.addEventListener('pointermove', this.onCursorMove);
+    window.addEventListener('pointerup', this.onCursorUp);
     this.addEventListener('wheel', this.onWheel);
   }
 
   removeEventListeners() {
     this.removeEventListener('pointerdown', this.cursorDown);
-    this.removeEventListener('pointermove', this.onCursorMove);
-    this.removeEventListener('pointerup', this.onCursorUp);
+    window.removeEventListener('pointermove', this.onCursorMove);
+    window.removeEventListener('pointerup', this.onCursorUp);
     this.removeEventListener('wheel', this.onWheel);
   }
 
@@ -160,7 +160,7 @@ export class SimpleImageAdjust extends LitElement {
     this.eventCache.push(event);
   }
 
-  onCursorMove(event: PointerEvent) {
+  onCursorMove = (event: PointerEvent) => {
     if (this.isCursorDown) {
       // NOTE: Translate
       this.offsetX = event.x - this.cursorDownX;
@@ -191,7 +191,7 @@ export class SimpleImageAdjust extends LitElement {
     }
   }
 
-  onCursorUp(event: PointerEvent) {
+  onCursorUp = (event: PointerEvent) => {
     // NOTE: Translate
     this.cursorDownX = 0;
     this.cursorDownY = 0;
@@ -219,6 +219,11 @@ export class SimpleImageAdjust extends LitElement {
 
   scale(amount = 0) {
     this.zoom += amount;
+  }
+
+  disconnectedCallback(): void {
+    this.removeEventListeners();
+    super.disconnectedCallback();
   }
 
 }
