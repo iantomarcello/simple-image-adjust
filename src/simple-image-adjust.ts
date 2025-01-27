@@ -2,16 +2,20 @@ import { LitElement, PropertyValues, css, html } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js'
 
 /**
- * An example element.
+ * An image loader that can be reposition and rescaled.
  *
- * @slot - This element has a slot
- * @csspart button - The button
+ * @property {string} src - The image source URL.
+ * @property {number} offsetX - The horizontal offset.
+ * @property {number} offsetY - The vertical offset.
+ * @property {number} zoom - The zoom level.
+ * @property {boolean} editMode - Enable edit mode.
  */
+
 @customElement('simple-image-adjust')
 export class SimpleImageAdjust extends LitElement {
   @property() src!: string;
-  @property({ type: Number }) posX: number = 0;
-  @property({ type: Number }) posY: number = 0;
+  @property({ type: Number }) offsetX: number = 0;
+  @property({ type: Number }) offsetY: number = 0;
   @property({ type: Number }) zoom: number = 1;
   @property({ type: Boolean, attribute: "edit-mode" }) editMode: boolean = false;
   @query('#canvas') canvas!: HTMLCanvasElement;
@@ -102,7 +106,7 @@ export class SimpleImageAdjust extends LitElement {
         this.removeEventListeners();
       }
     }
-    if (['posX', 'posY', 'zoom'].some(prop => _changedProperties.has(prop))) {
+    if (['offsetX', 'offsetY', 'zoom'].some(prop => _changedProperties.has(prop))) {
       this.draw();
     }
   }
@@ -132,12 +136,14 @@ export class SimpleImageAdjust extends LitElement {
   draw() {
     if (this.ctx) {
       const { width, height } = this.img;
+      const centreX = this.clientWidth / 2 - this.img.width / 2 * this.zoom;
+      const centreY = this.clientHeight / 2 - this.img.height / 2 * this.zoom;
 
       this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
       this.ctx.drawImage(
         this.img,
-        this.posX,
-        this.posY,
+        centreX + this.offsetX,
+        centreY + this.offsetY,
         width * this.zoom,
         height * this.zoom,
       );
@@ -146,8 +152,8 @@ export class SimpleImageAdjust extends LitElement {
 
   cursorDown(event: PointerEvent) {
     // NOTE: Translate
-    this.cursorDownX = event.x - this.posX;
-    this.cursorDownY = event.y - this.posY;
+    this.cursorDownX = event.x - this.offsetX;
+    this.cursorDownY = event.y - this.offsetY;
     this.isCursorDown = true;
 
     // NOTE: Scale
@@ -157,13 +163,14 @@ export class SimpleImageAdjust extends LitElement {
   onCursorMove(event: PointerEvent) {
     if (this.isCursorDown) {
       // NOTE: Translate
-      this.posX = event.x - this.cursorDownX;
-      this.posY = event.y - this.cursorDownY;
+      this.offsetX = event.x - this.cursorDownX;
+      this.offsetY = event.y - this.cursorDownY;
 
       // NOTE: Scale
       // @see https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures
       const index = this.eventCache.findIndex(
         (cachedEv) => cachedEv.pointerId === event.pointerId,
+
       );
       this.eventCache[index] = event;
 
