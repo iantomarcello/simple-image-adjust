@@ -30,6 +30,7 @@ export class SimpleImageAdjust extends LitElement {
   static styles = css`
     :host {
       display: block;
+      position: relative;
     }
 
     #wrapper, #canvas {
@@ -40,7 +41,7 @@ export class SimpleImageAdjust extends LitElement {
     }
 
     #controls {
-      position: fixed;
+      position: absolute;
       left: 50%;
       bottom: 1rem;
       translate: -50% 0;
