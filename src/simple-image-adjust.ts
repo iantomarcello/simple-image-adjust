@@ -80,6 +80,9 @@ export class SimpleImageAdjust extends LitElement {
           <button type="button" title="zoom out" @click=${() => this.scale(-0.05)}>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400ZM280-540v-80h200v80H280Z"/></svg>
           </button>
+          <button type="button" title="reset" @click=${this.resetAdjusments}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-122q-121-15-200.5-105.5T160-440q0-66 26-126.5T260-672l57 57q-38 34-57.5 79T240-440q0 88 56 155.5T440-202v80Zm80 0v-80q87-16 143.5-83T720-440q0-100-70-170t-170-70h-3l44 44-56 56-140-140 140-140 56 56-44 44h3q134 0 227 93t93 227q0 121-79.5 211.5T520-122Z"/></svg>
+          </button>
         </div>
       </div>
     `
@@ -219,6 +222,12 @@ export class SimpleImageAdjust extends LitElement {
 
   scale(amount = 0) {
     this.zoom += amount;
+  }
+
+  resetAdjusments() {
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.zoom = 1;
   }
 
   disconnectedCallback(): void {
